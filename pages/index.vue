@@ -1,26 +1,27 @@
 <template>
   <div class="h-[calc(100vh)] bg-[hsl(275,100%,97%)] flex flex-col items-center">
-    <div class="h-[30vh]">
-      <img class="w-full h-full" src="/images/background-pattern-mobile.svg" alt="Background Pattern Mobile">
+    <div>
+      <img v-if="isMobile" src="/images/background-pattern-mobile.svg" alt="Background Pattern Mobile">
+      <img v-else src="/images/background-pattern-desktop.svg" alt="Background Pattern Desktop">
     </div>
     <div class="bg-[hsl(0,0%,100%)] rounded-lg w-[87%] h-[65%] mt-[-90px] shadow-lg flex flex-col p-7 md:w-[42%] md:rounded-3xlg">
       <div class="flex w-[100%] pb-3">
-        <img class="w-[23px]" src="/images/icon-star.svg" alt="Icon Star">
-        <h1 class="font-[700] text-[hsl(292,42%,14%)] text-[32px] ml-[18px]">
+        <img class="w-[23px] md:w-[40px]" src="/images/icon-star.svg" alt="Icon Star">
+        <h1 class="font-[700] text-[hsl(292,42%,14%)] text-[32px] ml-[18px] md:text-[50px]">
           FAQs
         </h1>
       </div>
 
       <div v-for="(question, index) in questions" :key="index">
-        <div class="flex justify-between mb-5">
-          <h1 class="text-[hsl(292,42%,14%)] font-[600] leading-5 w-[230px]">
+        <div class="flex justify-between mb-5 cursor-pointer" @click="() => toggleAnswer(index)">
+          <h1 class="text-[hsl(292,42%,14%)] font-[600] leading-5 w-[230px] hover:text-[#A53CD6] md:w-full md:text-[18px]">
             {{ question.title }}
           </h1>
-          <a class="flex justify-center items-center h-full cursor-pointer" @click="() => toggleAnswer(index)">
+          <a class="flex justify-center items-center h-full">
             <img :src="showAnswers[index] ? '/images/icon-minus.svg' : '/images/icon-plus.svg'" alt="Toggle Icon">
           </a>
         </div>
-        <p v-if="showAnswers[index]" class="text-[hsl(292,16%,49%)] text-[14px] mb-5">
+        <p v-if="showAnswers[index]" class="text-[hsl(292,16%,49%)] text-[14px] mb-5 md:text-[16px]">
           {{ question.answer }}
         </p>
         <hr class="mb-5">
@@ -32,6 +33,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+// Comportamento do accordion
 const questions = [
   {
     title: 'What is Frontend Mentor, and how will it help me?',
@@ -50,10 +52,21 @@ const questions = [
     answer: 'Frontend Mentor has a supportive community. You can ask for help in the community forum, or join their Discord server to connect with other developers and get assistance.'
   }
 ]
-
 const showAnswers = ref(new Array(questions.length).fill(false))
-
 const toggleAnswer = (index: number) => {
   showAnswers.value = showAnswers.value.map((value, i) => i === index ? !value : false)
 }
+
+// Comportamento da imagem atrás do card
+const isMobile = ref(false)
+const checkMediaQuery = () => {
+  isMobile.value = window.matchMedia('(max-width: 375px)').matches
+}
+onMounted(() => {
+  checkMediaQuery()
+  window.addEventListener('resize', checkMediaQuery)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkMediaQuery)
+})
 </script>
